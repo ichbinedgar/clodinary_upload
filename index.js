@@ -98,7 +98,7 @@ app.post('/api/upload', upload.fields([{ name: 'file', maxCount: 1 }]), function
 
 })
 
-app.listen(8080, () => {
+app.listen(process.env.PORT, () => {
     console.log("Running server!");
 
 })
