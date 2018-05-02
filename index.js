@@ -4,6 +4,7 @@ const bodyParser = require("body-parser")
 const cloudinary = require('cloudinary');
 const mongoose = require("mongoose")
 const app = express();
+const fs = require("fs")
 require('dotenv').config()
 
 var multer = require('multer')
@@ -13,7 +14,9 @@ var storage = multer.diskStorage({
         cb(null, './uploads')
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + "." + file.fieldname.format)
+        let originalname = file.originalname.split(".")[1]     
+        let ext = originalname.split(".")[1]     
+        cb(null, file.fieldname + '-' + Date.now() + "." + ext )
     }
 })
 
@@ -67,6 +70,9 @@ app.post('/api/upload', upload.fields([{ name: 'file', maxCount: 1 }]), function
 
     const saveFile = async (cloudinaryFile) => {
         console.log(cloudinaryFile);
+        fs.unlink(req.files.file[0].path, (err) => {
+            console.log(err);            
+        })
 
         const file = new urlsDB({
             uri: cloudinaryFile.secure_url,
@@ -77,7 +83,8 @@ app.post('/api/upload', upload.fields([{ name: 'file', maxCount: 1 }]), function
         res.send(result).status(200)
     }
 
-    cloudinary.uploader.upload(req.files.file[0].path, function (result) {
+    cloudinary.uploader.upload(req.files.file[0].path, function (result) {    
+
         saveFile(result)
     }, {
             resource_type: "video"
