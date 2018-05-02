@@ -7,15 +7,15 @@ const app = express();
 const fs = require("fs")
 require('dotenv').config()
 
-var multer = require('multer')
+const multer = require('multer')
 
-var dir = './uploads';
+const dir = './uploads';
 
 if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
 }
 
-var storage = multer.diskStorage({
+const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, dir)
     },
@@ -26,7 +26,7 @@ var storage = multer.diskStorage({
     }
 })
 
-var upload = multer({ storage: storage })
+const upload = multer({ storage: storage })
 
 const urlsDB = mongoose.model("url", {
     uri: {
