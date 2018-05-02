@@ -9,9 +9,15 @@ require('dotenv').config()
 
 var multer = require('multer')
 
+var dir = './uploads';
+
+if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+}
+
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './uploads')
+        cb(null, dir)
     },
     filename: function (req, file, cb) {
         let originalname = file.originalname.split(".")[1]     
