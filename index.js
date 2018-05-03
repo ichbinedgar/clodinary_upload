@@ -1,18 +1,20 @@
 // import dependencies to configure server
 const express = require("express")
 const bodyParser = require("body-parser")
-const cloudinary = require('cloudinary');
+const cloudinary = require('cloudinary')
 const mongoose = require("mongoose")
-const app = express();
+const app = express()
 const fs = require("fs")
+const cors = require('cors')
 require('dotenv').config()
+
 
 const multer = require('multer')
 
-const dir = './uploads';
+const dir = './uploads'
 
 if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
+    fs.mkdirSync(dir)
 }
 
 const storage = multer.diskStorage({
@@ -49,10 +51,17 @@ cloudinary.config({
     cloud_name: process.env.cloud_name,
     api_key: process.env.api_key,
     api_secret: process.env.api_secret
-});
+})
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cors());
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'DELETE, PUT, GET, POST');
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 app.get('/', (req, res) => {
     res.send("WORKING")
@@ -60,24 +69,24 @@ app.get('/', (req, res) => {
 
 app.get('/api/files', (req, res) => {
     const getFiles = async () => {
-        return await urlsDB.find();
+        return await urlsDB.find()
     }
 
     const queryFiles = async (req, res) => {
-        const files = await getFiles();
+        const files = await getFiles()
         res.send(files).status(200).json()
     }
 
-    queryFiles(req, res);
+    queryFiles(req, res)
 
 })
 
 app.post('/api/upload', upload.fields([{ name: 'file', maxCount: 1 }]), function (req, res, next) {
 
     const saveFile = async (cloudinaryFile) => {
-        console.log(cloudinaryFile);
+        console.log(cloudinaryFile)
         fs.unlink(req.files.file[0].path, (err) => {
-            console.log(err);            
+            console.log(err)            
         })
 
         const file = new urlsDB({
@@ -94,11 +103,11 @@ app.post('/api/upload', upload.fields([{ name: 'file', maxCount: 1 }]), function
         saveFile(result)
     }, {
             resource_type: "video"
-        });
+        })
 
 })
 
 app.listen(process.env.PORT, () => {
-    console.log("Running server!");
+    console.log("Running server!")
 
 })
